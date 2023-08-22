@@ -41,11 +41,44 @@ window.addEventListener('load', (event) => {
   // Add all the divs to the HTML
   document.querySelector('#memory-board').innerHTML = html;
 
+  const flippedCards = [];
+
+  function handleCardClick(card) {
+    if (!card.classList.contains('blocked') && !card.classList.contains('turned') && flippedCards.length < 2) {
+      card.classList.add('turned');
+      flippedCards.push(card);
+  
+      if (flippedCards.length === 2) {
+        const card1 = flippedCards[0].getAttribute('data-card-name');
+        const card2 = flippedCards[1].getAttribute('data-card-name');
+  
+        if (memoryGame.checkIfPair(card1, card2)) {
+          flippedCards.forEach((card) => card.classList.add('blocked'));
+          flippedCards.length = 0; // Clear the flippedCards array
+        } else {
+          setTimeout(() => {
+            flippedCards.forEach((card) => {
+              card.classList.remove('turned');
+            });
+            flippedCards.length = 0; // Clear the flippedCards array
+          }, 1000);
+        }
+  
+        document.getElementById('pairs-clicked').textContent = memoryGame.pairsClicked;
+        document.getElementById('pairs-guessed').textContent = memoryGame.pairsGuessed;
+  
+        if (memoryGame.checkIfFinished()) {
+          alert('You won!');
+        }
+      }
+    }
+  }
+
   // Bind the click event of each element to a function
   document.querySelectorAll('.card').forEach((card) => {
     card.addEventListener('click', () => {
       // TODO: write some code here
-      console.log(`Card clicked: ${card}`);
+      handleCardClick(card);
     });
   });
 });
